@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Redirecting...</title>
+	<script type="text/javascript">
+		/*
+		This file randomly redirects a user to one of the URLs in a list. It is built
+		with the intent of randomization in a controlled experiment.
+
+		For example, create three Google Docs forms (or equivalent) and add their URLs
+		to the list below. That's it!
+
+		The user is then automatically and randomly assigned to one of the URLs when
+		the user visits this file. If the user decides to close and reopen the browser,
+		the user is still redirected to the same URL since a cookie is saved in the
+		user's browser.
+		
+		Peter M. Dahlgren
+		@peterdalle
+		peterdahlgren.com
+		2016-01-05
+		*/
+		
+		// List of URLs (two or more) for the experimental treatment and control groups.
+		var RedirectURLs = {
+			"urls" : [
+				{ "url" : "http://www.aftonbladet.se/" },
+				{ "url" : "http://www.dn.se/" },
+				{ "url" : "http://www.svd.se/" }
+			]
+		}
+
+		// Count the number of URLs in list.
+		var Groups = RedirectURLs.urls.length;
+
+		// Randomize number and get the corresponding index for the URL in list.
+		var gotoUrl = RedirectURLs.urls[GetRandomNumber(Groups)].url
+
+		// Perform redirection.
+		if (window.location.search == "?debug") {
+			// Debug mode: If user supplies a ?debug querystring,
+			// then only show the redirect URL, but don't actually redirect.
+			document.write("Redirect URL: " + gotoUrl);
+		} else {
+			// Redirect the user to the new URL.
+			document.location = gotoUrl;
+		}
+
+		// Perform randomization and save it to a cookie.
+		function GetRandomNumber(Groups) {
+			// Has cookie been set?
+			var rndIndex = null;
+			if (GetCookie() != "") {
+				// Yes, get randomization from cookie.
+				rndIndex = GetCookie()
+			} else {
+				// No, set random value to cookie.
+				rndIndex = Math.floor((Math.random() * Groups));
+				SetCookie(rndIndex, 30) // Set cookie for 30 days.
+			}
+			return rndIndex
+		}
+
+		// Set cookie with randomization value.
+		function SetCookie(CookieValue, DaysUntilExpire) {
+			var d = new Date();
+			d.setTime(d.getTime() + (DaysUntilExpire * 24 * 60 * 60 * 1000));
+			document.cookie = "rnd=" + CookieValue + ";expires=" + d.toUTCString();
+		}
+
+		// Get cookie with randomization value. Return empty string if not set.
+		function GetCookie() {
+			var ca = document.cookie.split(';');
+			for(var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') c = c.substring(1);
+				if (c.indexOf("rnd=") == 0) return c.substring(4, c.length);
+			}
+			return "";
+		}
+	</script>
+</head>
+<body>
+</body>
+</html>
